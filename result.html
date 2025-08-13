@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Feedback Results</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('https://web.ua.edu.ph/wp-content/uploads/2024/09/ua-logo.png') no-repeat center center;
+    background-size: contain;
+    opacity: 0.1;
+    z-index: -1;
+  }
+  .container {
+    width: 90%;
+    max-width: 1400px;
+    margin: auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    margin-top: 20px;
+    overflow-x: auto;
+  }
+  h1 { margin-bottom: 20px; }
+  label, select { font-size: 16px; margin: 10px 0; display: block; width: 100%; }
+  select { padding: 8px; width: 100%; max-width: 300px; margin-bottom: 15px; }
+  .table-wrapper { overflow-x: auto; width: 100%; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 800px; }
+  th, td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; }
+  th { background: #88a6ff; color: white; }
+  .btn {
+    margin: 10px 5px 0 0;
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s ease;
+  }
+  .btn-logout, .btn-settings { background: rgb(106, 143, 255); float: right; margin-bottom: 20px; }
+  .btn-logout:hover, .btn-settings:hover { background: rgba(255, 97, 97, 0.8); }
+  .btn-clear { background: rgb(255, 100, 100); }
+  .btn-clear:hover { background: rgb(230, 70, 70); }
+  .btn-download { background: rgb(62, 165, 255); }
+  .btn-download:hover { background: rgb(80, 136, 160); }
+  .download-filtered { background: rgb(80, 200, 120); }
+  .download-filtered:hover { background: rgb(60, 170, 100); }
+
+  @media (max-width: 768px) {
+    th, td { padding: 10px; font-size: 14px; }
+    .btn { padding: 8px 12px; font-size: 14px; margin-bottom: 10px; }
+    .btn-logout, .btn-settings { float: none; width: 100%; margin-bottom: 10px; }
+    .container { width: 95%; padding: 20px; }
+  }
+  @media (max-width: 480px) {
+    th, td { padding: 8px; font-size: 13px; }
+    h1 { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <button class="btn btn-logout" onclick="logout()">Logout</button>
+
+  <h1>Survey Submissions</h1>
+
+  <label for="visitorFilter">Filter by Visitor Type:</label>
+  <select id="visitorFilter"></select>
+
+  <div class="table-wrapper">
+    <div id="resultContainer"></div>
+  </div>
+
+  <button class="btn btn-clear" id="clearDataBtn">Clear All Submissions</button>
+  <button class="btn btn-download" onclick="downloadResults()">Download All Results</button>
+  <button class="btn download-filtered" onclick="downloadFiltered()">Download Filtered Results</button>
+
+</div>
+
+<script>
+if (localStorage.getItem("isAdmin") !== "true") {
+  window.location.href = "admin.html";
+}
+
+const resultContainer = document.getElementById("resultContainer");
+const visitorFilter = document.getElementById("visitorFilter");
+const clearBtn = document.getElementById("clearDataBtn");
+const downloadByTypeSelect = document.getElementById("downloadByType");
+
+function getSurveyList() {
+  return JSON.parse(localStorage.getItem("surveyList") || "[]");
+}
+
+function getVisitorCounts(dataList) {
+  const types = ["Admin", "Student", "Faculty", "Guest"];
+  const counts = { All: dataList.length };
+  types.forEach(type => {
+    counts[type] = dataList.filter(d => d.visitorType === type).length;
+  });
+  return counts;
+}
+
+function updateDropdowns() {
+  const surveyList = getSurveyList();
+  const counts = getVisitorCounts(surveyList);
+
+  // Visitor Filter dropdown
+  visitorFilter.innerHTML = Object.keys(counts).map(type =>
+    `<option value="${type}">${type} (${counts[type]})</option>`
+  ).join("");
+
+  // Download By Type dropdown
+  const types = ["Admin","Student","Faculty","Guest"];
+  downloadByTypeSelect.innerHTML = '<option value="">Select...</option>' +
+    types.map(type => `<option value="${type}">${type} (${counts[type]})</option>`).join("");
+}
+
+function renderTable(dataList) {
+  if (!dataList || dataList.length === 0) {
+    resultContainer.innerHTML = "<p>No survey data found.</p>";
+    return;
+  }
+  let table = `
+    <table>
+      <thead>
+        <tr>
+          <th>Visitor Type</th>
+          <th>Name</th>
+          <th>Purpose</th>
+          <th>Date & Time Submitted</th>
+          <th>Staff Rating</th>
+          <th>Concern Addressed</th>
+          <th>Overall Rating</th>
+          <th>Recommend</th>
+          <th>Comments</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  dataList.forEach(data => {
+    table += `
+      <tr>
+        <td>${data.visitorType}</td>
+        <td>${data.name || "N/A"}</td>
+        <td>${data.purpose}</td>
+        <td>${data.date}</td>
+        <td>${data.staffRating}</td>
+        <td>${data.concernAddressed}</td>
+        <td>${data.overallRating}</td>
+        <td>${data.recommend}</td>
+        <td>${data.comments || "None"}</td>
+        <td>${data.email || "N/A"}</td>
+      </tr>
+    `;
+  });
+  table += `</tbody></table>`;
+  resultContainer.innerHTML = table;
+}
+
+function filterData() {
+  const selectedType = visitorFilter.value;
+  const surveyList = getSurveyList();
+  const filtered = selectedType === "All"
+    ? surveyList
+    : surveyList.filter(entry => entry.visitorType === selectedType);
+  renderTable(filtered);
+  return filtered;
+}
+
+clearBtn.addEventListener("click", function () {
+  if (confirm("Are you sure you want to clear all survey submissions?")) {
+    localStorage.removeItem("surveyList");
+    updateDropdowns();
+    filterData();
+  }
+});
+
+visitorFilter.addEventListener("change", filterData);
+
+function logout() {
+  localStorage.removeItem("isAdmin");
+  window.location.href = "admin.html";
+}
+
+function downloadCSV(data, filename = "survey_results.csv") {
+  if (data.length === 0) {
+    alert("No survey submissions to download.");
+    return;
+  }
+  const header = [
+    "visitorType", "name", "purpose", "date", "staffRating",
+    "concernAddressed", "overallRating", "recommend", "comments", "email"
+  ];
+  const csvRows = [
+    header.join(","),
+    ...data.map(row =>
+      header.map(field => `"${(row[field] || "").replace(/"/g, '""')}"`).join(",")
+    )
+  ];
+  const csvContent = csvRows.join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.setAttribute("href", url);
+  a.setAttribute("download", filename);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function downloadResults() {
+  const data = getSurveyList();
+  downloadCSV(data, "all_survey_results.csv");
+}
+
+function downloadFiltered() {
+  const filtered = filterData();
+  downloadCSV(filtered, `filtered_${visitorFilter.value}_results.csv`);
+}
+
+function downloadByType(type) {
+  if (!type) return;
+  const data = getSurveyList().filter(entry => entry.visitorType === type);
+  downloadCSV(data, `${type}_survey_results.csv`);
+}
+
+// Initialize
+updateDropdowns();
+filterData();
+</script>
+</body>
+</html>
