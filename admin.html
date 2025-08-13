@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      background: url('https://web.ua.edu.ph/wp-content/uploads/2024/09/ua-logo.png') no-repeat center center;
+      background-size: contain;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    h2 { text-align: center; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: rgb(106, 143, 255);
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background-color: rgba(255, 97, 97, 0.8); }
+    .error { color: red; text-align: center; display: none; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Admin Login</h2>
+    <div class="error" id="errorMsg">Invalid username or password.</div>
+    <form id="adminLoginForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <script>
+    const ADMIN_USERNAME = "Admin";
+    const ADMIN_PASSWORD = "CITCLS";
+
+    // Redirect only if already logged in
+    if (localStorage.getItem("isAdmin") === "true") {
+      window.location.href = "result.html";
+    }
+
+    document.getElementById("adminLoginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        localStorage.setItem("isAdmin", "true"); // Use a consistent key
+        window.location.href = "result.html";
+      } else {
+        document.getElementById("errorMsg").style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
