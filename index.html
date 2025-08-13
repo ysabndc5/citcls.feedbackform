@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Visitor Feedback Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Georgia, 'Times New Roman', Times, serif, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background-color: #f8f8f8;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('https://web.ua.edu.ph/wp-content/uploads/2024/09/ua-logo.png') no-repeat center center;
+      background-size: contain;
+      filter: blur(8px);
+      z-index: -1;
+    }
+    #dateTimeDisplay {
+      position: fixed;
+      top: 10px;
+      left: 15px;
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    h1 { margin-top: 70px; text-align: center; }
+    form {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 25px;
+      border-radius: 10px;
+      max-width: 1200px;
+      width: 95%;
+      margin: 10px auto;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 15px rgba(0,0,0,0.15);
+    }
+    .form-row { display: flex; flex-direction: column; margin-bottom: 15px; }
+    .form-row label { font-weight: bold; margin-bottom: 5px; }
+    .form-row input, .form-row select, .form-row textarea {
+      padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px;
+    }
+    button[type="submit"] {
+      background: #4c7aac; color: white; border: none; padding: 12px 24px;
+      border-radius: 5px; cursor: pointer; font-size: 16px; display: block; margin: 20px auto 0;
+    }
+    button[type="submit"]:hover { background: #45a049; }
+    .rating-group { display: flex; flex-wrap: nowrap; gap: 15px; align-items: center; }
+    .rating-group label { display: flex; align-items: center; gap: 5px; font-weight: normal; }
+    @media (max-width: 480px) {
+      form { padding: 15px; }
+      .form-row label, .rating-group label { font-size: 14px; }
+      .form-row input, .form-row select, .form-row textarea { font-size: 14px; }
+      .rating-group { flex-wrap: wrap; gap: 10px; }
+    }
+    @media (min-width: 768px) {
+      .form-row { flex-direction: row; align-items: center; }
+      .form-row label { flex: 1; min-width: 180px; }
+      .form-row input, .form-row select, .form-row textarea { flex: 2; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="dateTimeDisplay">Loading...</div>
+
+<h1>Visitor Feedback Form</h1>
+
+<form id="surveyForm">
+  <!-- Visitor Type -->
+  <div class="form-row">
+    <label for="visitorType">Type of Visitors:</label>
+    <select id="visitorType" name="visitorType" required>
+      <option value="">Select...</option>
+      <option value="Admin">Admin</option>
+      <option value="Student">Student</option>
+      <option value="Faculty">Faculty</option>
+      <option value="Guest">Guest</option>
+    </select>
+  </div>
+
+  <!-- Name -->
+  <div class="form-row">
+    <label for="name">Name: (Optional)</label>
+    <input type="text" id="name" name="name" placeholder="Enter your name">
+  </div>
+
+  <!-- Purpose -->
+  <div class="form-row">
+    <label for="purpose">Purpose of Visit:</label>
+    <select id="purpose" name="purpose" required>
+      <option value="">Select...</option>
+      <option value="Inquiry">Inquiry</option>
+      <option value="Enrollment">Enrollment</option>
+      <option value="Consultation">Consultation</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
+
+  <!-- Staff Rating -->
+  <div class="form-row">
+    <label>Staff Accommodation Level:</label>
+    <div class="rating-group">
+      <label><input type="radio" name="staffRating" value="5" required>5 ⭐</label>
+      <label><input type="radio" name="staffRating" value="4">4 ⭐</label>
+      <label><input type="radio" name="staffRating" value="3">3 ⭐</label>
+      <label><input type="radio" name="staffRating" value="2">2 ⭐</label>
+      <label><input type="radio" name="staffRating" value="1">1 ⭐</label>
+    </div>
+  </div>
+
+  <!-- Concern Addressed -->
+  <div class="form-row">
+    <label>Was your concern addressed?</label>
+    <select name="concernAddressed" required>
+      <option value="">Select...</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+  </div>
+
+  <!-- Overall Rating -->
+  <div class="form-row">
+    <label>Overall Experience Level:</label>
+    <div class="rating-group">
+      <label><input type="radio" name="overallRating" value="5" required>5 ⭐</label>
+      <label><input type="radio" name="overallRating" value="4">4 ⭐</label>
+      <label><input type="radio" name="overallRating" value="3">3 ⭐</label>
+      <label><input type="radio" name="overallRating" value="2">2 ⭐</label>
+      <label><input type="radio" name="overallRating" value="1">1 ⭐</label>
+    </div>
+  </div>
+
+  <!-- Recommend -->
+  <div class="form-row">
+    <label>Would you recommend our service?</label>
+    <select name="recommend" required>
+      <option value="">Select...</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+  </div>
+
+  <!-- Comments -->
+  <div class="form-row">
+    <label>Suggestions or Comments:</label>
+    <textarea name="comments" rows="4"></textarea>
+  </div>
+
+  <!-- Email -->
+  <div class="form-row">
+    <label>Email (optional):</label>
+    <input type="email" name="email" placeholder="Enter your email">
+  </div>
+
+  <button type="submit">Submit Feedback</button>
+</form>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  // ===== Date/Time Display =====
+  function updateDateTimeDisplay() {
+    const now = new Date();
+    const date = now.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    const time = now.toLocaleTimeString();
+    const dtElement = document.getElementById("dateTimeDisplay");
+    if (dtElement) dtElement.textContent = `${date} | ${time}`;
+  }
+  updateDateTimeDisplay();
+  setInterval(updateDateTimeDisplay, 1000);
+
+  // ===== Initialize EmailJS =====
+  emailjs.init("W-OJHfM_Oe9kVDIqN");
+
+  // ===== Form Submission =====
+  const surveyForm = document.getElementById("surveyForm");
+  if (!surveyForm) return;
+
+  surveyForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    const form = this;
+    const formData = new FormData(form);
+    const submissionDateTime = new Date().toLocaleString();
+
+    const staffRating = form.querySelector('input[name="staffRating"]:checked');
+    const overallRating = form.querySelector('input[name="overallRating"]:checked');
+
+    const surveyData = {
+      visitorType: formData.get("visitorType") || "",
+      name: formData.get("name") || "",
+      purpose: formData.get("purpose") || "",
+      date: submissionDateTime,
+      staffRating: staffRating ? staffRating.value : "",
+      concernAddressed: formData.get("concernAddressed") || "",
+      overallRating: overallRating ? overallRating.value : "",
+      recommend: formData.get("recommend") || "",
+      comments: formData.get("comments") || "",
+      email: formData.get("email") || ""
+    };
+
+    // ===== Save in localStorage =====
+    const surveyList = JSON.parse(localStorage.getItem("surveyList") || "[]");
+    surveyList.push(surveyData);
+    localStorage.setItem("surveyList", JSON.stringify(surveyList));
+    localStorage.setItem("lastSurvey", JSON.stringify(surveyData));
+    if (surveyData.name) localStorage.setItem("feedbackName", surveyData.name);
+
+    // ===== Prepare EmailJS template params =====
+    const templateParams = {
+      visitorType: surveyData.visitorType,
+      name: surveyData.name || "Anonymous",
+      purpose: surveyData.purpose,
+      date: surveyData.date,
+      staffRating: surveyData.staffRating,
+      concernAddressed: surveyData.concernAddressed,
+      overallRating: surveyData.overallRating,
+      recommend: surveyData.recommend,
+      comments: surveyData.comments,
+      from_email: "citcls.office@gmail.com"
+    };
+
+    // Send email to survey taker
+    if (surveyData.email) {
+      emailjs.send("service_3llmtmq", "template_mnopc48", { ...templateParams, to_email: surveyData.email })
+        .then(() => console.log("Survey sent to user ✅"))
+        .catch(err => console.error("Error sending email to user:", err));
+    }
+
+    // Send email to admin
+    emailjs.send("service_3llmtmq", "template_mnopc48", { ...templateParams, to_email: "citcls.office@gmail.com" })
+      .then(() => console.log("Survey sent to admin ✅"))
+      .catch(err => console.error("Error sending email to admin:", err));
+
+    // Redirect to thank you page
+    window.location.href = "thankyou.html";
+  });
+
+});
+</script>
+
+</body>
+</html>
